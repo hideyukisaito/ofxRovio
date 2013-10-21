@@ -179,16 +179,7 @@ ofPoint Status::getNormalizedPosition()
 
 Rovio::Rovio()
 {
-    string res = "content: Cmd = nav\n"
-    "responses = 0|x=2940|y=1308|theta=2.995|room=0|ss=10444\n"
-    "|beacon=0|beacon_x=0|next_room=2|next_room_ss=694\n"
-    "|state=0|ui_status=0|resistance=0|sm=15|pp=0|flags=0005\n"
-    "|brightness=6|resolution=3|video_compression=2|frame_rate=30\n"
-    "|privilege=0|user_check=1|speaker_volume=31|mic_volume=16\n"
-    "|wifi_ss=199|show_time=0|ddns_state=0|email_state=0\n"
-    "|battery=120|charging=72|head_position=203|ac_freq=2";
     
-    status.setStatus(res);
 }
 
 Rovio::~Rovio()
@@ -209,7 +200,6 @@ void Rovio::start()
 {
     ofAddListener(httpUtils.rovioResponseEvent, this, &Rovio::newResponseEvent);
     httpUtils.start();
-    getReport();
 }
 
 void Rovio::stop()
