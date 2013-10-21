@@ -2,7 +2,7 @@ ofxRovio
 ===
 
 openFrameworks addon for communicating and controlling WowWee's Rovio.  
-**The implementation is not correct, WIP.**
+**The implementation is not correct. Please use at your own risk.**
 
 ## Dependencies
 
