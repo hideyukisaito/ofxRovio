@@ -2,16 +2,18 @@
 
 #include "ofMain.h"
 #include "ofxHttpUtils.h"
+#include "IPVideoGrabber.h"
 #include "Poco/DynamicAny.h"
 
 using Poco::DynamicAny;
 
 namespace ofxRovio
 {
-    enum CameraQuality {
-        CAM_QUALITY_LOW    = 0,
-        CAM_QUALITY_MEDIUM = 1,
-        CAM_QUALITY_HIGH   = 2,
+    // representing image quality
+    enum CameraCompressRatio {
+        CAM_COMPRESS_LOW    = 0,
+        CAM_COMPRESS_MEDIUM = 1,
+        CAM_COMPRESS_HIGH   = 2,
     };
     
     enum CameraBrightness {
@@ -22,6 +24,13 @@ namespace ofxRovio
         CAM_BRIGHTNESS_BRIGHT    = 4,
         CAM_BRIGHTNESS_BRIGHTER  = 5,
         CAM_BRIGHTNESS_BRIGHTEST = 6,
+    };
+    
+    enum CameraResolution {
+        QCIF = 0, // 176x144
+        QVGA = 1, // 320x240
+        SIF  = 2, // 352x240
+        VGA  = 3, // 640x480
     };
     
     enum DriveSpeed {
@@ -242,6 +251,12 @@ public:
     void setup(const string hostname, const string username = "", const string password = "");
     void start();
     void stop();
+    void startStreaming();
+    void stopStreaming();
+    void update();
+    void draw();
+    void draw(float x, float y);
+    void draw(float x, float y, float width, float height);
     
     void getReport();
     void startRecording();
@@ -286,8 +301,12 @@ public:
     void rotateLeftBy20Degrees(DriveSpeed speed);
     void rotateRightBy20Degrees(DriveSpeed speed);
     
-    void setCameraQuality(CameraQuality quality);
+    void setCameraCompressRatio(CameraCompressRatio ratio);
+    void setCameraResolution(CameraResolution resolution);
+    void setCameraFrameRate(int framerate);
     void setCameraBrightness(CameraBrightness brightness);
+    void setSpeakerVolume(int volume);
+    void setMicVolume(int volume);
     
     string getHostname();
     string getUsername();
@@ -300,6 +319,8 @@ public:
 private:
 
     RovioHttpUtils httpUtils;
+    
+    ofx::Video::IPVideoGrabber ipVidGrabber;
     
     string hostname;
     string username;

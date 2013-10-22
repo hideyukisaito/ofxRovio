@@ -179,15 +179,12 @@ ofPoint Status::getNormalizedPosition()
 
 Rovio::Rovio()
 {
+    
 }
 
 Rovio::~Rovio()
 {
-    if (bStart)
-    {
-        ofRemoveListener(httpUtils.rovioResponseEvent, this, &Rovio::newResponseEvent);
-        httpUtils.stop();
-    }
+    stop();
 }
 
 void Rovio::setup(const string hostname, const string username, const string password)
@@ -208,9 +205,44 @@ void Rovio::start()
 
 void Rovio::stop()
 {
+    stopStreaming();
     ofRemoveListener(httpUtils.rovioResponseEvent, this, &Rovio::newResponseEvent);
     httpUtils.stop();
     bStart = false;
+}
+
+void Rovio::startStreaming()
+{
+    ipVidGrabber.setUsername(username);
+    ipVidGrabber.setPassword(password);
+    ipVidGrabber.setURI(hostname + "/GetData.cgi");
+    ipVidGrabber.connect();
+}
+
+void Rovio::stopStreaming()
+{
+    ipVidGrabber.disconnect();
+    ipVidGrabber.close();
+}
+
+void Rovio::update()
+{
+    ipVidGrabber.update();
+}
+
+void Rovio::draw()
+{
+    ipVidGrabber.draw(0, 0);
+}
+
+void Rovio::draw(float x, float y)
+{
+    ipVidGrabber.draw(x, y);
+}
+
+void Rovio::draw(float x, float y, float width, float height)
+{
+    ipVidGrabber.draw(x, y, width, height);
 }
 
 
@@ -453,18 +485,46 @@ void Rovio::manualDrive(DriveMode mode, DriveSpeed speed)
 
 #pragma mark - Camera Controls
 
-void Rovio::setCameraQuality(CameraQuality quality)
+void Rovio::setCameraCompressRatio(CameraCompressRatio ratio)
 {
     map<string, DynamicAny> params;
-    params.insert(map<string, DynamicAny>::value_type("Ratio", DynamicAny((int)quality)));
+    params.insert(map<string, DynamicAny>::value_type("Ratio", DynamicAny((int)ratio)));
     sendRequest("/ChangeCompressRatio.cgi", params);
+}
+
+void Rovio::setCameraResolution(CameraResolution resolution)
+{
+    map<string, DynamicAny> params;
+    params.insert( map<string, DynamicAny>::value_type("ResType", DynamicAny((int)resolution)) );
+    sendRequest("/ChangeResolution.cgi", params);
+}
+
+void Rovio::setCameraFrameRate(int framerate)
+{
+    map<string, DynamicAny> params;
+    params.insert( map<string, DynamicAny>::value_type("Framerate", DynamicAny(framerate)) );
+    sendRequest("/ChangeFramerate.cgi", params);
 }
 
 void Rovio::setCameraBrightness(CameraBrightness brightness)
 {
     map<string, DynamicAny> params;
-    params.insert( map<string, DynamicAny>::value_type("Brightness", DynamicAny((int) brightness)) );
+    params.insert( map<string, DynamicAny>::value_type("Brightness", DynamicAny((int)brightness)) );
     sendRequest("/ChangeBrightness.cgi", params);
+}
+
+void Rovio::setSpeakerVolume(int volume)
+{
+    map<string, DynamicAny> params;
+    params.insert( map<string, DynamicAny>::value_type("SpeakerVolume", DynamicAny(volume)) );
+    sendRequest("/ChangeSpeakerVolume.cgi", params);
+}
+
+void Rovio::setMicVolume(int volume)
+{
+    map<string, DynamicAny> params;
+    params.insert( map<string, DynamicAny>::value_type("MicVolume", DynamicAny(volume)) );
+    sendRequest("/ChangeMicVolume.cgi", params);
 }
 
 
