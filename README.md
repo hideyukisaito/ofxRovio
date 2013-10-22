@@ -16,9 +16,10 @@ This addon depends on the followings:
 ```
 using namespace ofxRovio;
 
+Rovio rovio;
+
 void testApp::setup()
 {
-	Rovio rovio;
 	// set username and password, if needed
 	rovio.setup("localhost", "username", "password");
 	ofAddListener(rovio.responseReceived, this, &testApp::onRovioResponseReceived);
