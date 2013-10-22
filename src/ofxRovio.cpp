@@ -116,12 +116,48 @@ Status::~Status()
     
 }
 
-void Status::setStatus(ofxHttpResponse response)
+void Status::setStatusFromResponse(RovioHttpResponse response)
 {
     if (200 != response.status) return;
     
     string body = response.responseBody.getText();
-    ofLog() << body;
+    
+    StringTokenizer t1(body, "\n");
+    
+    for (StringTokenizer::Iterator it = t1.begin(); t1.end() != it; ++it)
+    {
+        StringTokenizer t2(*it, "|", StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
+        
+        for (StringTokenizer::Iterator it2 = t2.begin(); t2.end() != it2; ++it2)
+        {
+            StringTokenizer t3(*it2, "=", StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
+            
+            string key = t3[0];
+            DynamicAny value(t3[1]);
+            
+            if ("x" == key) {
+                position.x = value.convert<float>();
+            } else if ("y" == key) {
+                position.y = value.convert<float>();
+            } else if ("theta" == key) {
+                theta = value.convert<float>();
+            } else if ("room" == key) {
+                roomID = (RoomID)value.convert<int>();
+            } else if ("ss" == key) {
+                navigationSignalStrength = value.convert<unsigned int>();
+            } else if ("beacon" == key) {
+                beaconSignalStrength = value.convert<unsigned int>();
+            } else if ("beacon_x" == key) {
+                beaconX = value.convert<int>();
+            } else if ("state" == key) {
+                state = (State)value.convert<int>();
+            } else if ("flags" == key) {
+                flag = (Flag)value.convert<int>();
+            } else if ("charging" == key) {
+                charging = value.convert<int>();
+            }
+        }
+    }
 }
 
 void Status::setStatus(string response)
@@ -172,6 +208,47 @@ ofPoint Status::getPosition()
 ofPoint Status::getNormalizedPosition()
 {
     return position / ofPoint(32767, 32767, 1);
+}
+
+float Status::getTheta()
+{
+    return theta;
+}
+
+RoomID Status::getRoomID()
+{
+    return roomID;
+}
+
+SignalStrength Status::getNavigationSignalStrength()
+{
+    if (47000 < navigationSignalStrength)
+    {
+        return SIGNAL_STRONG;
+    }
+    else if (5000 > navigationSignalStrength)
+    {
+        return SIGNAL_WEAK;
+    }
+    return SIGNAL_MEDIUM;
+}
+
+SignalStrength Status::getBeaconSignalStrength()
+{
+    if (47000 < beaconSignalStrength)
+    {
+        return SIGNAL_STRONG;
+    }
+    else if (5000 > beaconSignalStrength)
+    {
+        return SIGNAL_WEAK;
+    }
+    return SIGNAL_MEDIUM;
+}
+
+State Status::getState()
+{
+    return state;
 }
 
 
@@ -232,16 +309,19 @@ void Rovio::update()
 
 void Rovio::draw()
 {
+    ofSetColor(255, 255, 255);
     ipVidGrabber.draw(0, 0);
 }
 
 void Rovio::draw(float x, float y)
 {
+    ofSetColor(255, 255, 255);
     ipVidGrabber.draw(x, y);
 }
 
 void Rovio::draw(float x, float y, float width, float height)
 {
+    ofSetColor(255, 255, 255);
     ipVidGrabber.draw(x, y, width, height);
 }
 
@@ -565,7 +645,12 @@ void Rovio::sendCommandRequest(Action action, map<string, Poco::DynamicAny> para
 
 void Rovio::newResponseEvent(RovioHttpResponse &response)
 {
-    ofNotifyEvent(Rovio::responseReceived, response);
+    if (GET_REPORT == response.actionCommand)
+    {
+        status.setStatusFromResponse(response);
+        ofNotifyEvent(Rovio::statusUpdated, status, this);
+    }
+    ofNotifyEvent(Rovio::responseReceived, response, this);
 }
 
 

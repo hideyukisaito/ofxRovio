@@ -27,5 +27,7 @@ public:
     
     Rovio rovio;
     ofPoint position;
+    float degrees;
+    void onRovioStatusUpdated(Status &status);
     void onRovioResponseReceived(RovioHttpResponse &response);
 };

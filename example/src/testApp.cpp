@@ -10,6 +10,7 @@ void testApp::setup()
     // set your hostname / username / password
     rovio.setup("10.4.0.96", "admin", "admin");
     ofAddListener(rovio.responseReceived, this, &testApp::onRovioResponseReceived);
+    ofAddListener(rovio.statusUpdated, this, &testApp::onRovioStatusUpdated);
     rovio.start();
     rovio.startStreaming();
 }
@@ -18,14 +19,11 @@ void testApp::setup()
 void testApp::update()
 {
     rovio.update();
-    position = rovio.getStatus().getNormalizedPosition();
 }
 
 //--------------------------------------------------------------
 void testApp::draw()
 {
-    rovio.draw(0, 0, 320, 240);
-    
     ofPushMatrix();
     {
         float x = position.x * 300;
@@ -41,13 +39,24 @@ void testApp::draw()
         ofPopMatrix();
         
         ofEnableAlphaBlending();
-        ofSetColor(14, 102, 237, 200 - 200 * ((float)(ofGetFrameNum() % 30) / 30.0));
-        ofFill();
-        ofCircle(x, y, 15 + (1.3 * (float)(ofGetFrameNum() % 30)));
-        ofDisableAlphaBlending();
-        ofCircle(x, y, 15);
+        ofPushMatrix();
+        {
+            ofTranslate(x, y);
+            ofRotateZ(degrees);
+            
+            ofDrawAxis(100);
+            
+            ofSetColor(14, 102, 237, 200 - 200 * ((float)(ofGetFrameNum() % 30) / 30.0));
+            ofFill();
+            ofCircle(0, 0, 15 + (1.3 * (float)(ofGetFrameNum() % 30)));
+            ofDisableAlphaBlending();
+            ofCircle(0, 0, 15);
+        }
+        ofPopMatrix();
     }
     ofPopMatrix();
+    
+    rovio.draw(0, 0, 320, 240);
 }
 
 //--------------------------------------------------------------
@@ -74,6 +83,13 @@ void testApp::keyPressed(int key)
 		default:
 			break;
 	}
+}
+
+void testApp::onRovioStatusUpdated(ofxRovio::Status &status)
+{
+    ofLog() << "status updated";
+    position = status.getNormalizedPosition();
+    degrees = ofRadToDeg(status.getTheta());
 }
 
 void testApp::onRovioResponseReceived(RovioHttpResponse &response)

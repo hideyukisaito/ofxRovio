@@ -206,7 +206,7 @@ public:
     Status();
     ~Status();
     
-    void setStatus(ofxHttpResponse response);
+    void setStatusFromResponse(RovioHttpResponse response);
     void setStatus(string response);
     
     ofPoint getPosition();
@@ -315,6 +315,7 @@ public:
     Status getStatus();
     
     ofEvent<RovioHttpResponse> responseReceived;
+    ofEvent<Status> statusUpdated;
     
 private:
 
