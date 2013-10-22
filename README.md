@@ -16,9 +16,10 @@ This addon depends on the followings:
 ```
 using namespace ofxRovio;
 
+Rovio rovio;
+
 void testApp::setup()
 {
-	Rovio rovio;
 	// set username and password, if needed
 	rovio.setup("localhost", "username", "password");
 	ofAddListener(rovio.responseReceived, this, &testApp::onRovioResponseReceived);
@@ -33,27 +34,39 @@ void testApp::setup()
 
 void testApp::keyPressed(int key)
 {
-	if (OF_KEY_UP == key) {
-		rovio.moveForward(SPEED_FASTEST);
-	} else if (OF_KEY_DOWN == key) {
-		rovio.moveBackward(SPEED_FASTEST);
-	} else if (OF_KEY_LEFT == key) {
-		rovio.moveLeft(SPEED_FASTEST);
-	} else if (OF_KEY_RIGHT == key) {
-		rovio.moveRight(SPEED_FASTEST);
-	} else {
-		rovio.stopMoving();
+	switch (key)
+	{
+		case OF_KEY_UP:
+			rovio.moveForward(SPEED_FASTEST);
+			break;
+		
+		case OF_KEY_DOWN:
+			rovio.moveBackward(SPEED_FASTEST);
+			break;
+			
+		case OF_KEY_LEFT:
+			rovio.moveLeft(SPEED_FASTEST);
+			break;
+			
+		case OF_KEY_RIGHT:
+			rovio.moveRight(SPEED_FASTEST);
+			break;
+			
+		default:
+			break;
 	}
 }
 
 void testApp::onRovioResponseReceived(ofxRovio::RovioHttpResponse &response)
 {
-	if (200 == response.status) {
+	if (200 == response.status)
+	{
 		Action actionCommand = response.actionCommand;
 		
-		switch (actionCommand) {
+		switch (actionCommand)
+		{
 			case GET_REPORT:
-				ofLog() << rovio.getStatus().getPosition();
+				ofLog() << rovio.getStatus()->getPosition();
 				break;
 				
 			default:

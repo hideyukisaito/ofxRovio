@@ -4,8 +4,6 @@
 #include "ofxHttpUtils.h"
 #include "Poco/DynamicAny.h"
 
-using Poco::Any;
-using Poco::AnyCast;
 using Poco::DynamicAny;
 
 namespace ofxRovio
@@ -306,6 +304,7 @@ private:
     string hostname;
     string username;
     string password;
+    bool bStart;
     
     Status status;
     

@@ -179,12 +179,15 @@ ofPoint Status::getNormalizedPosition()
 
 Rovio::Rovio()
 {
-    
 }
 
 Rovio::~Rovio()
 {
-    httpUtils.stop();
+    if (bStart)
+    {
+        ofRemoveListener(httpUtils.rovioResponseEvent, this, &Rovio::newResponseEvent);
+        httpUtils.stop();
+    }
 }
 
 void Rovio::setup(const string hostname, const string username, const string password)
@@ -200,11 +203,14 @@ void Rovio::start()
 {
     ofAddListener(httpUtils.rovioResponseEvent, this, &Rovio::newResponseEvent);
     httpUtils.start();
+    bStart = true;
 }
 
 void Rovio::stop()
 {
+    ofRemoveListener(httpUtils.rovioResponseEvent, this, &Rovio::newResponseEvent);
     httpUtils.stop();
+    bStart = false;
 }
 
 
