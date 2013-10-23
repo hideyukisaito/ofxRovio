@@ -312,6 +312,8 @@ public:
     string getUsername();
     string getPassword();
     
+    ofx::Video::SharedIPVideoGrabber getStream();
+    
     Status getStatus();
     
     ofEvent<RovioHttpResponse> responseReceived;
@@ -321,12 +323,13 @@ private:
 
     RovioHttpUtils httpUtils;
     
-    ofx::Video::IPVideoGrabber ipVidGrabber;
+    ofx::Video::SharedIPVideoGrabber ipVidGrabber;
     
     string hostname;
     string username;
     string password;
     bool bStart;
+    bool bStartStreaming;
     
     Status status;
     

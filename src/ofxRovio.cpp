@@ -256,7 +256,7 @@ State Status::getState()
 
 Rovio::Rovio()
 {
-    
+    ipVidGrabber = ofx::Video::IPVideoGrabber::makeShared();
 }
 
 Rovio::~Rovio()
@@ -290,39 +290,41 @@ void Rovio::stop()
 
 void Rovio::startStreaming()
 {
-    ipVidGrabber.setUsername(username);
-    ipVidGrabber.setPassword(password);
-    ipVidGrabber.setURI(hostname + "/GetData.cgi");
-    ipVidGrabber.connect();
+    ipVidGrabber->setUsername(username);
+    ipVidGrabber->setPassword(password);
+    ipVidGrabber->setURI("http://" + hostname + "/GetData.cgi");
+    ipVidGrabber->connect();
+    bStartStreaming = true;
 }
 
 void Rovio::stopStreaming()
 {
-    ipVidGrabber.disconnect();
-    ipVidGrabber.close();
+    ipVidGrabber->disconnect();
+    ipVidGrabber->close();
+    bStartStreaming = false;
 }
 
 void Rovio::update()
 {
-    ipVidGrabber.update();
+    if (bStartStreaming) ipVidGrabber->update();
 }
 
 void Rovio::draw()
 {
     ofSetColor(255, 255, 255);
-    ipVidGrabber.draw(0, 0);
+    ipVidGrabber->draw(0, 0);
 }
 
 void Rovio::draw(float x, float y)
 {
     ofSetColor(255, 255, 255);
-    ipVidGrabber.draw(x, y);
+    ipVidGrabber->draw(x, y);
 }
 
 void Rovio::draw(float x, float y, float width, float height)
 {
     ofSetColor(255, 255, 255);
-    ipVidGrabber.draw(x, y, width, height);
+    ipVidGrabber->draw(x, y, width, height);
 }
 
 
@@ -669,6 +671,11 @@ string Rovio::getUsername()
 string Rovio::getPassword()
 {
     return password;
+}
+
+ofx::Video::SharedIPVideoGrabber Rovio::getStream()
+{
+    return ipVidGrabber;
 }
 
 Status Rovio::getStatus()
