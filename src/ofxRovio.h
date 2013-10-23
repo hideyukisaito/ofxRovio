@@ -185,6 +185,7 @@ public:
     
     void addUrl(string url);
     void addUrl(string url, Action actionCommand);
+    void addForm(RovioHttpForm form);
     RovioHttpResponse getUrl(string url, Action actionCommand);
     
     void threadedFunction();

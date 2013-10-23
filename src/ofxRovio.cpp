@@ -16,7 +16,12 @@ RovioHttpResponse::RovioHttpResponse(HTTPResponse& pocoResponse, std::istream &b
 
 void RovioHttpUtils::addUrl(string url)
 {
-    ofxHttpUtils::addUrl(url);
+    RovioHttpForm form;
+	form.action=url;
+	form.method=OFX_HTTP_GET;
+    form.name=form.action;
+    
+	RovioHttpUtils::addForm(form);
 }
 
 void RovioHttpUtils::addUrl(string url, Action actionCommand)
@@ -27,7 +32,14 @@ void RovioHttpUtils::addUrl(string url, Action actionCommand)
     form.name=form.action;
     form.actionCommand = actionCommand;
     
-	ofxHttpUtils::addForm(form);
+	RovioHttpUtils::addForm(form);
+}
+
+void RovioHttpUtils::addForm(RovioHttpForm form)
+{
+	lock();
+    forms.push(form);
+    unlock();
 }
 
 RovioHttpResponse RovioHttpUtils::getUrl(string url, Action actionCommand)
@@ -81,13 +93,13 @@ void RovioHttpUtils::threadedFunction()
 			if (form.method == OFX_HTTP_POST)
             {
 				doPostForm(form);
-				printf("ofxHttpUtils: (thread running) form submitted (post): %s\n", form.name.c_str());
+				printf("RovioHttpForm: (thread running) form submitted (post): %s\n", form.name.c_str());
 			}
             else
             {
 				string url = ofxHttpUtils::generateUrl(form);
                 Action actionCommand = form.actionCommand;
-				printf("ofxHttpUtils: (thread running) form submitted (get): %s\n", form.name.c_str());
+				printf("RovioHttpForm: (thread running) form submitted (get): %s\n", form.name.c_str());
 				RovioHttpUtils::getUrl(url, actionCommand);
 			}
     		lock();
